@@ -38,7 +38,7 @@ In each page's `<head>`:
 | compare | `ui-compare` | ui.js | Versions of one sound, heard from the same moment: before and after a change. Space plays, 1 to 9 pick. |
 | plot | `ui-plot` | ui.js | A handful of numbers to compare at a glance: per bar, per run, per version. band marks the range that's fine. |
 | copy | `ui-copy` | ui.js | A command or snippet people paste: a Copy button on its code block. |
-| tabs | `.tabs` | base.css | Switch between instructions for different loaders or platforms. The radio controls work without JavaScript. |
+| tabs | `.tabs` | base.css | Use loader tabs when each download needs its own installation steps. |
 | soon | `.soon` | base.css | Show a pending store listing with its review date. |
 | actions | `.actions` | base.css | Put downloads and source links together below the lead. |
 | meta | `.meta, .lead` | base.css | Show a short lead and supporting metadata such as an update date. |
@@ -191,10 +191,21 @@ Avoid: Code people read rather than run.
 
 ### tabs
 
-Switch between instructions for different loaders or platforms. The radio controls work without JavaScript.
+Use loader tabs when each download needs its own installation steps.
 
 ```html
-<div class="tabs"><input type="radio" name="ex-tabs" id="ex-a" checked><label for="ex-a">Fabric</label><input type="radio" name="ex-tabs" id="ex-b"><label for="ex-b">NeoForge</label><div class="tab"><p>Put the jar in mods.</p></div><div class="tab"><p>Put the NeoForge build in mods.</p></div></div>
+<div class="tabs" role="group" aria-label="Mod loader">
+  <input type="radio" name="ex-tabs" id="ex-a" checked><label for="ex-a">Fabric</label>
+  <input type="radio" name="ex-tabs" id="ex-b"><label for="ex-b">NeoForge</label>
+  <div class="tab">
+    <h3>Install on Fabric</h3>
+    <ul><li>Install Fabric Loader and Fabric API.</li><li>Put the Fabric build in <code>mods</code>.</li></ul>
+  </div>
+  <div class="tab">
+    <h3>Install on NeoForge</h3>
+    <ul><li>Install NeoForge for your game version.</li><li>Put the NeoForge build in <code>mods</code>.</li></ul>
+  </div>
+</div>
 ```
 
 ### soon

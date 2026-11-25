@@ -106,3 +106,17 @@ ui-copy .ui-button{order:-1;align-self:flex-end}
   height: var(--s1);
   accent-color: var(--foreground);
 }
+
+.ui-progress progress {
+  appearance: none;
+  border: 0;
+  background: var(--border);
+}
+
+.ui-progress progress::-webkit-progress-bar { background: var(--border); }
+.ui-progress progress::-webkit-progress-value { background: var(--foreground); }
+.ui-progress progress::-moz-progress-bar { background: var(--foreground); }
+
+@media (forced-colors: active) {
+  .ui-progress progress { appearance: auto; }
+}

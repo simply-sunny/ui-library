@@ -11,6 +11,7 @@ components.json (ui/) is the one source: the docs, the gallery and --show all co
 """
 import argparse
 import filecmp
+import hashlib
 import html
 import json
 import math
@@ -116,40 +117,45 @@ def gallery(dest):
     shutil.copy2(SHARED / 'gallery.css', assets / 'gallery.css')
     shutil.copy2(SHARED / 'gallery.js', assets / 'gallery.js')
     sections = []
-    groups = {'ui.css': ('Interface', []), 'ui.js': ('Interactive', []), 'base.css': ('Wiki', [])}
-    wide = {'wave', 'compare', 'plot', 'compare-table'}
+    groups = {'base.css': ('Wiki', []), 'ui.css': ('Interface', []), 'ui.js': ('Interactive', [])}
     for c in m['components']:
         name = html.escape(c['name'])
-        title = html.escape(c['name'].replace('-', ' ').capitalize())
+        title = html.escape({'tabs': 'Loader tabs', 'compare': 'A/B audio', 'wave': 'Waveform'}.get(
+            c['name'], c['name'].replace('-', ' ').capitalize()))
         selector = html.escape(c['selector'])
         stylesheet = html.escape(c['from'])
         example = c['example']
-        avoid = f'<p class="part__note"><span>Avoid</span> {html.escape(c["avoid"])}</p>' if c.get('avoid') else ''
         group = groups[c['from']][0]
-        size = ' part--wide' if c['name'] in wide else ''
-        groups[c['from']][1].append(f'<a href="#{name}">{title}</a>')
+        description = html.escape(c['use'])
+        note = f'<p class="part__note">{html.escape(c["avoid"])}</p>' if c.get('avoid') else ''
+        groups[c['from']][1].append(f'<a href="#{name}" data-search="{html.escape(title + " " + selector + " " + description, quote=True)}">{title}</a>')
         sections.append(f"""
-          <section class="part{size}" id="{name}" data-group="{group}" aria-labelledby="{name}-title">
+          <section class="part" id="{name}" aria-labelledby="{name}-title">
             <header class="part__header">
+              <p class="part__category">{group}</p>
               <h2 id="{name}-title">{title}</h2>
-              <code>{selector}</code>
+              <p class="part__description">{description}</p>
             </header>
-            <div class="part__frame">
-              <div class="part__live"><div class="part__example">{example}</div></div>
-              <details class="part__source">
-                <summary><span>View markup</span><code>{stylesheet}</code></summary>
-                <ui-copy><pre><code>{html.escape(example)}</code></pre></ui-copy>
-              </details>
+            <div class="stage">
+              <div class="stage__label"><span>Live preview</span><code>{selector}</code></div>
+              <div class="stage__body"><div class="stage__example">{example}</div></div>
             </div>
-            <p class="part__description">{html.escape(c["use"])}</p>
-            {avoid}
+            <details class="part__source">
+              <summary><span>HTML</span><code>{stylesheet}</code></summary>
+              <ui-copy><pre><code>{html.escape(example)}</code></pre></ui-copy>
+            </details>
+            {note}
           </section>
         """)
     navigation = ''.join(
         f'<div class="index__group"><p>{label}</p>{"".join(links)}</div>'
         for label, links in groups.values()
     )
-    about = html.escape(m['about'].partition('. ')[0])
+    asset_paths = ('base.css', 'ui/ui.css', 'ui/ui.js', 'gallery.css', 'gallery.js')
+    versions = {path: hashlib.sha256((assets / path).read_bytes()).hexdigest()[:12] for path in asset_paths}
+    def asset(path):
+        return f'./assets/{path}?v={versions[path]}'
+
     page = f"""<!doctype html>
 <html lang="en">
 <head>
@@ -157,43 +163,33 @@ def gallery(dest):
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#000000">
   <title>UI Library</title>
-  {''.join(m['head'])}
-  <link rel="stylesheet" href="./assets/gallery.css">
-  <script type="module" src="./assets/gallery.js"></script>
+  <link rel="stylesheet" href="{asset('base.css')}">
+  <link rel="stylesheet" href="{asset('ui/ui.css')}">
+  <link rel="stylesheet" href="{asset('gallery.css')}">
+  <script type="module" src="{asset('gallery.js')}"></script>
+  <script type="module" src="{asset('ui/ui.js')}"></script>
 </head>
-<body id="top">
-  <a class="skip" href="#components">Skip to components</a>
-  <header class="gallery-header">
-    <div class="gallery-header__inner">
-      <a class="gallery-brand" href="#top">UI Library</a>
-      <nav aria-label="Library links"><a href="https://github.com/simply-sunny/ui-library/blob/main/docs/COMPONENTS.md">Reference</a><a href="https://github.com/simply-sunny/ui-library">GitHub ↗</a></nav>
+<body>
+  <a class="skip" href="#components">Skip to preview</a>
+  <header class="masthead">
+    <div class="masthead__inner">
+      <h1>UI Library</h1>
+      <nav aria-label="Library links">
+        <a href="https://github.com/simply-sunny/ui-library/blob/main/docs/COMPONENTS.md">Reference</a>
+        <a href="https://github.com/simply-sunny/ui-library">GitHub ↗</a>
+      </nav>
     </div>
   </header>
   <div class="gallery">
-    <nav class="index" aria-label="Component index">{navigation}</nav>
-    <main id="components" tabindex="-1">
-      <header class="gallery-intro">
-        <h1>Components</h1>
-        <p>{about}.</p>
-        <nav class="featured" aria-label="Featured components">
-          <a href="#tabs"><strong>Loader tabs</strong><span>Switch install instructions</span><span aria-hidden="true">↘</span></a>
-          <a href="#compare"><strong>A/B audio</strong><span>Hear versions in sync</span><span aria-hidden="true">↘</span></a>
-          <a href="#callout"><strong>Callout</strong><span>Highlight a requirement</span><span aria-hidden="true">↘</span></a>
-        </nav>
-      </header>
-      <div class="catalog-tools" hidden>
-        <label for="component-search">Find a component</label>
-        <input id="component-search" type="search" placeholder="Search names and descriptions">
-        <div class="catalog-filters" role="group" aria-label="Component type">
-          <button type="button" aria-pressed="true">All</button>
-          <button type="button" aria-pressed="false">Interface</button>
-          <button type="button" aria-pressed="false">Interactive</button>
-          <button type="button" aria-pressed="false">Wiki</button>
-        </div>
-        <p class="catalog-status" role="status"></p>
+    <aside class="sidebar">
+      <div class="index-search" hidden>
+        <label class="sr-only" for="component-search">Find a component</label>
+        <input id="component-search" type="search" placeholder="Find a component">
+        <p class="index-status" role="status"></p>
       </div>
-      <div class="catalog">{''.join(sections)}</div>
-    </main>
+      <nav class="index" aria-label="Components">{navigation}</nav>
+    </aside>
+    <main id="components" tabindex="-1">{''.join(sections)}</main>
   </div>
 </body>
 </html>

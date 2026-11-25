@@ -1,49 +1,55 @@
-const tools = document.querySelector('.catalog-tools');
-const search = document.querySelector('#component-search');
-const filters = [...document.querySelectorAll('.catalog-filters button')];
-const status = document.querySelector('.catalog-status');
-const entries = [...document.querySelectorAll('.part')].map(card => ({
-  card,
-  searchText: [...card.querySelectorAll('h2, .part__header code, .part__description')]
-    .map(node => node.textContent.toLowerCase()).join(' '),
-}));
+const main = document.querySelector('#components');
+const parts = new Map([...main.querySelectorAll('.part')].map(part => [part.id, part]));
 const links = [...document.querySelectorAll('.index a')];
-let active = filters[0];
+const search = document.querySelector('#component-search');
+const status = document.querySelector('.index-status');
+let selected;
 
-function updateCatalog() {
-  const query = search.value.trim().toLowerCase();
-  const group = active.textContent;
-  let visible = 0;
-  for (const {card, searchText} of entries) {
-    card.hidden = !searchText.includes(query) || (group !== 'All' && card.dataset.group !== group);
-    if (!card.hidden) visible += 1;
+function selectPart(id, scroll = false) {
+  const next = parts.get(id);
+  if (!next) return;
+  if (selected && selected !== next) {
+    selected.querySelectorAll('audio').forEach(audio => audio.pause());
   }
-  status.textContent = visible === 0 ? 'No matching components.' : '';
-}
-
-function selectFilter(button) {
-  active.setAttribute('aria-pressed', 'false');
-  active = button;
-  active.setAttribute('aria-pressed', 'true');
-  updateCatalog();
-}
-
-function syncLocation() {
+  selected = next;
+  for (const part of parts.values()) part.hidden = part !== selected;
   for (const link of links) {
-    if (link.hash === location.hash) link.setAttribute('aria-current', 'location');
+    if (link.hash === '#' + id) link.setAttribute('aria-current', 'location');
     else link.removeAttribute('aria-current');
   }
+  if (scroll) {
+    if (matchMedia('(max-width: 680px)').matches) main.scrollIntoView();
+    else window.scrollTo(0, 0);
+  }
 }
 
-document.querySelectorAll('.index a, .featured a').forEach(link => {
-  link.addEventListener('click', () => {
-    if (!document.getElementById(link.hash.slice(1)).hidden) return;
-    search.value = '';
-    selectFilter(filters[0]);
-  });
+function followHash() {
+  const id = location.hash.slice(1);
+  if (!id || parts.has(id)) selectPart(id || 'tabs', Boolean(id));
+}
+
+main.closest('.gallery').addEventListener('click', event => {
+  const link = event.target.closest('a[href^="#"]');
+  const id = link?.hash.slice(1);
+  if (!parts.has(id) || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+  event.preventDefault();
+  if (location.hash !== link.hash) history.pushState(null, '', link.hash);
+  selectPart(id, true);
 });
-for (const button of filters) button.addEventListener('click', () => selectFilter(button));
-search.addEventListener('input', updateCatalog);
-window.addEventListener('hashchange', syncLocation);
-syncLocation();
-tools.hidden = false;
+search.addEventListener('input', () => {
+  const query = search.value.toLowerCase().trim();
+  for (const link of links) link.hidden = !link.dataset.search.toLowerCase().includes(query);
+  for (const group of document.querySelectorAll('.index__group')) {
+    group.hidden = !group.querySelector('a:not([hidden])');
+  }
+  status.textContent = links.every(link => link.hidden) ? 'No matching components.' : '';
+});
+search.addEventListener('keydown', event => {
+  if (event.key === 'Enter') links.find(link => !link.hidden)?.click();
+});
+window.addEventListener('popstate', followHash);
+window.addEventListener('hashchange', followHash);
+document.documentElement.dataset.enhanced = '';
+document.querySelector('.index-search').hidden = false;
+selectPart('tabs');
+followHash();

@@ -207,8 +207,8 @@
       "kind": "class",
       "selector": ".tabs",
       "from": "base.css",
-      "use": "Switch between instructions for different loaders or platforms. The radio controls work without JavaScript.",
-      "example": "<div class=\"tabs\"><input type=\"radio\" name=\"ex-tabs\" id=\"ex-a\" checked><label for=\"ex-a\">Fabric</label><input type=\"radio\" name=\"ex-tabs\" id=\"ex-b\"><label for=\"ex-b\">NeoForge</label><div class=\"tab\"><p>Put the jar in mods.</p></div><div class=\"tab\"><p>Put the NeoForge build in mods.</p></div></div>"
+      "use": "Use loader tabs when each download needs its own installation steps.",
+      "example": "<div class=\"tabs\" role=\"group\" aria-label=\"Mod loader\">\n  <input type=\"radio\" name=\"ex-tabs\" id=\"ex-a\" checked><label for=\"ex-a\">Fabric</label>\n  <input type=\"radio\" name=\"ex-tabs\" id=\"ex-b\"><label for=\"ex-b\">NeoForge</label>\n  <div class=\"tab\">\n    <h3>Install on Fabric</h3>\n    <ul><li>Install Fabric Loader and Fabric API.</li><li>Put the Fabric build in <code>mods</code>.</li></ul>\n  </div>\n  <div class=\"tab\">\n    <h3>Install on NeoForge</h3>\n    <ul><li>Install NeoForge for your game version.</li><li>Put the NeoForge build in <code>mods</code>.</li></ul>\n  </div>\n</div>"
     },
     {
       "name": "soon",
