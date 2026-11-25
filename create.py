@@ -62,7 +62,7 @@ def show(name):
 def docs():
     m = manifest()
     out = ['# Components', '',
-           '<!-- Written by `python3 create.py --docs > docs/COMPONENTS.md` from ui//components.json. Edit that file, not this one. -->', '',
+           '<!-- Written by `python3 create.py --docs > docs/COMPONENTS.md` from ui/components.json. Edit that file, not this one. -->', '',
            m['about'], '', 'In each page\'s `<head>`:', '', '```html', *m['head'], '```', '',
            '`python3 create.py --gallery <dir>` builds a page showing every part. `--show <name>` prints one.', '', '## Rules', '']
     out += ['- ' + r for r in m['rules']]
@@ -117,6 +117,7 @@ def gallery(dest):
     shutil.copy2(SHARED / 'gallery.js', assets / 'gallery.js')
     sections = []
     groups = {'ui.css': ('Interface', []), 'ui.js': ('Interactive', []), 'base.css': ('Wiki', [])}
+    wide = {'wave', 'compare', 'plot', 'compare-table'}
     for c in m['components']:
         name = html.escape(c['name'])
         title = html.escape(c['name'].replace('-', ' ').capitalize())
@@ -124,21 +125,23 @@ def gallery(dest):
         stylesheet = html.escape(c['from'])
         example = c['example']
         avoid = f'<p class="part__note"><span>Avoid</span> {html.escape(c["avoid"])}</p>' if c.get('avoid') else ''
+        group = groups[c['from']][0]
+        size = ' part--wide' if c['name'] in wide else ''
         groups[c['from']][1].append(f'<a href="#{name}">{title}</a>')
         sections.append(f"""
-          <section class="part" id="{name}" aria-labelledby="{name}-title">
+          <section class="part{size}" id="{name}" data-group="{group}" aria-labelledby="{name}-title">
             <header class="part__header">
               <h2 id="{name}-title">{title}</h2>
-              <p>{html.escape(c['use'])}</p>
+              <code>{selector}</code>
             </header>
             <div class="part__frame">
-              <div class="part__bar"><span>Preview</span><code>{selector}</code></div>
               <div class="part__live"><div class="part__example">{example}</div></div>
               <details class="part__source">
                 <summary><span>View markup</span><code>{stylesheet}</code></summary>
                 <ui-copy><pre><code>{html.escape(example)}</code></pre></ui-copy>
               </details>
             </div>
+            <p class="part__description">{html.escape(c["use"])}</p>
             {avoid}
           </section>
         """)
@@ -163,7 +166,7 @@ def gallery(dest):
   <header class="gallery-header">
     <div class="gallery-header__inner">
       <a class="gallery-brand" href="#top">UI Library</a>
-      <a href="https://github.com/simply-sunny/ui-library">GitHub ↗</a>
+      <nav aria-label="Library links"><a href="https://github.com/simply-sunny/ui-library/blob/main/docs/COMPONENTS.md">Reference</a><a href="https://github.com/simply-sunny/ui-library">GitHub ↗</a></nav>
     </div>
   </header>
   <div class="gallery">
@@ -172,8 +175,24 @@ def gallery(dest):
       <header class="gallery-intro">
         <h1>Components</h1>
         <p>{about}.</p>
+        <nav class="featured" aria-label="Featured components">
+          <a href="#tabs"><strong>Loader tabs</strong><span>Switch install instructions</span><span aria-hidden="true">↘</span></a>
+          <a href="#compare"><strong>A/B audio</strong><span>Hear versions in sync</span><span aria-hidden="true">↘</span></a>
+          <a href="#callout"><strong>Callout</strong><span>Highlight a requirement</span><span aria-hidden="true">↘</span></a>
+        </nav>
       </header>
-      {''.join(sections)}
+      <div class="catalog-tools" hidden>
+        <label for="component-search">Find a component</label>
+        <input id="component-search" type="search" placeholder="Search names and descriptions">
+        <div class="catalog-filters" role="group" aria-label="Component type">
+          <button type="button" aria-pressed="true">All</button>
+          <button type="button" aria-pressed="false">Interface</button>
+          <button type="button" aria-pressed="false">Interactive</button>
+          <button type="button" aria-pressed="false">Wiki</button>
+        </div>
+        <p class="catalog-status" role="status"></p>
+      </div>
+      <div class="catalog">{''.join(sections)}</div>
     </main>
   </div>
 </body>

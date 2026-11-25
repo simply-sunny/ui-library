@@ -1,6 +1,6 @@
 # Components
 
-<!-- Written by `python3 create.py --docs > docs/COMPONENTS.md` from ui//components.json. Edit that file, not this one. -->
+<!-- Written by `python3 create.py --docs > docs/COMPONENTS.md` from ui/components.json. Edit that file, not this one. -->
 
 Shared components for mod wikis and websites. The ui directory holds ui.css and ui.js. The base stylesheet holds the tokens and base components. Add them to a site with `python3 create.py --dest <site>/public/assets/ui`.
 
@@ -16,7 +16,7 @@ In each page's `<head>`:
 
 ## Rules
 
-- Use a part from this list before writing new CSS. A new part goes here, in the templates, not in one site.
+- Use the shared components before adding page-specific CSS. Add reusable parts to ui-library.
 - Spacing uses the tokens --s1 to --s8, or a token less 1px under a border (docs/LAYOUT.md). Line heights are multiples of 8.
 - Colours come from base.css: --foreground, --muted, --border, --focus. Elements read them at draw time.
 - No rounded corners, shadows, gradients or icons. Pressed or current things are underlined (text) or outlined (buttons).
@@ -38,10 +38,13 @@ In each page's `<head>`:
 | compare | `ui-compare` | ui.js | Versions of one sound, heard from the same moment: before and after a change. Space plays, 1 to 9 pick. |
 | plot | `ui-plot` | ui.js | A handful of numbers to compare at a glance: per bar, per run, per version. band marks the range that's fine. |
 | copy | `ui-copy` | ui.js | A command or snippet people paste: a Copy button on its code block. |
-| tabs | `.tabs` | base.css | The same steps for different setups, one shown at a time (Fabric first). Works without JavaScript; up to four tabs. |
-| soon | `.soon` | base.css | Something on its way: a store in review. data-tip says since when. |
-| actions | `.actions` | base.css | A row of links under a heading or lead: downloads, source. |
-| meta | `.meta, .lead` | base.css | .lead for the line under a title; .meta for small mono notes: dates, counts, keys. |
+| tabs | `.tabs` | base.css | Switch between instructions for different loaders or platforms. The radio controls work without JavaScript. |
+| soon | `.soon` | base.css | Show a pending store listing with its review date. |
+| actions | `.actions` | base.css | Put downloads and source links together below the lead. |
+| meta | `.meta, .lead` | base.css | Show a short lead and supporting metadata such as an update date. |
+| callout | `.ui-callout` | ui.css | Highlight a requirement or a brief note alongside the instructions. |
+| breadcrumbs | `.ui-breadcrumbs` | ui.css | Show where a page sits in a documentation hierarchy. |
+| progress | `.ui-progress` | ui.css | Show a known amount of work completed. |
 
 ### button
 
@@ -188,40 +191,56 @@ Avoid: Code people read rather than run.
 
 ### tabs
 
-The same steps for different setups, one shown at a time (Fabric first). Works without JavaScript; up to four tabs.
-
-Avoid: Content everyone should read.
+Switch between instructions for different loaders or platforms. The radio controls work without JavaScript.
 
 ```html
-<div class="tabs"><input type="radio" name="ex-tabs" id="ex-a" checked><label for="ex-a">Fabric</label><input type="radio" name="ex-tabs" id="ex-b"><label for="ex-b">NeoForge</label><div class="tab"><p>Put the jar in mods.</p></div><div class="tab"><p>Not yet.</p></div></div>
+<div class="tabs"><input type="radio" name="ex-tabs" id="ex-a" checked><label for="ex-a">Fabric</label><input type="radio" name="ex-tabs" id="ex-b"><label for="ex-b">NeoForge</label><div class="tab"><p>Put the jar in mods.</p></div><div class="tab"><p>Put the NeoForge build in mods.</p></div></div>
 ```
 
 ### soon
 
-Something on its way: a store in review. data-tip says since when.
-
-Avoid: Anything without a date.
+Show a pending store listing with its review date.
 
 ```html
-<span class="soon" tabindex="0" data-tip="In review since 2026-11-20"><span class="soon__spin"></span>CurseForge</span>
+<span class="soon" tabindex="0" data-tip="In review since 2026-11-20"><span class="soon__spin" aria-hidden="true"></span>CurseForge in review</span>
 ```
 
 ### actions
 
-A row of links under a heading or lead: downloads, source.
-
-Avoid: Buttons that act on the page.
+Put downloads and source links together below the lead.
 
 ```html
-<div class="actions"><a href="#">Modrinth ↗</a><a href="#">CurseForge ↗</a><span>1.20.1 to 26.3</span></div>
+<div class="actions"><a href="https://modrinth.com/">Modrinth ↗</a><a href="https://www.curseforge.com/">CurseForge ↗</a><span>1.20.1 to 26.3</span></div>
 ```
 
 ### meta
 
-.lead for the line under a title; .meta for small mono notes: dates, counts, keys.
-
-Avoid: Body text.
+Show a short lead and supporting metadata such as an update date.
 
 ```html
 <p class="lead">Old and new transitions, side by side.</p><p class="meta">Updated 2026-11-23</p>
+```
+
+### callout
+
+Highlight a requirement or a brief note alongside the instructions.
+
+```html
+<aside class="ui-callout" aria-labelledby="example-note"><h3 id="example-note">Client only</h3><p>Install the mod on your client. Servers can run without it.</p></aside>
+```
+
+### breadcrumbs
+
+Show where a page sits in a documentation hierarchy.
+
+```html
+<nav class="ui-breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="#components">Docs</a></li><li><a href="#tabs">Install</a></li><li aria-current="page">Fabric</li></ol></nav>
+```
+
+### progress
+
+Show a known amount of work completed.
+
+```html
+<div class="ui-progress"><label for="example-progress">Indexing files</label><span aria-hidden="true">7 / 12</span><progress id="example-progress" value="7" max="12">7 of 12</progress></div>
 ```

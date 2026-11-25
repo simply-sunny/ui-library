@@ -53,3 +53,56 @@ ui-compare{display:flex;flex-direction:column;gap:var(--s2)}
 ui-wave .ui-canvas{cursor:pointer}
 ui-copy{display:flex;flex-direction:column;gap:var(--s1)}
 ui-copy .ui-button{order:-1;align-self:flex-end}
+
+.ui-callout {
+  display: grid;
+  gap: var(--s1);
+  max-width: var(--measure);
+  padding: var(--s2);
+  border-inline-start: 2px solid var(--focus);
+  background: color-mix(in srgb, var(--foreground) 5%, var(--background));
+}
+
+.ui-callout p {
+  color: var(--foreground);
+}
+
+.ui-breadcrumbs ol {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 14px;
+  line-height: 24px;
+}
+
+.ui-breadcrumbs li + li::before {
+  content: "/" / "";
+  margin-inline-end: var(--s1);
+  color: var(--muted);
+}
+
+.ui-breadcrumbs [aria-current="page"] {
+  color: var(--muted);
+}
+
+.ui-progress {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: var(--s1);
+  width: min(100%, var(--measure));
+  font: 12px/16px PlexMono, monospace;
+}
+
+.ui-progress span {
+  color: var(--muted);
+}
+
+.ui-progress progress {
+  grid-column: 1 / -1;
+  width: 100%;
+  height: var(--s1);
+  accent-color: var(--foreground);
+}

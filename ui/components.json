@@ -6,7 +6,7 @@
     "<script type=\"module\" src=\"./assets/ui/ui.js\"></script>"
   ],
   "rules": [
-    "Use a part from this list before writing new CSS. A new part goes here, in the templates, not in one site.",
+    "Use the shared components before adding page-specific CSS. Add reusable parts to ui-library.",
     "Spacing uses the tokens --s1 to --s8, or a token less 1px under a border (docs/LAYOUT.md). Line heights are multiples of 8.",
     "Colours come from base.css: --foreground, --muted, --border, --focus. Elements read them at draw time.",
     "No rounded corners, shadows, gradients or icons. Pressed or current things are underlined (text) or outlined (buttons).",
@@ -205,38 +205,58 @@
     {
       "name": "tabs",
       "kind": "class",
-      "from": "base.css",
       "selector": ".tabs",
-      "use": "The same steps for different setups, one shown at a time (Fabric first). Works without JavaScript; up to four tabs.",
-      "avoid": "Content everyone should read.",
-      "example": "<div class=\"tabs\"><input type=\"radio\" name=\"ex-tabs\" id=\"ex-a\" checked><label for=\"ex-a\">Fabric</label><input type=\"radio\" name=\"ex-tabs\" id=\"ex-b\"><label for=\"ex-b\">NeoForge</label><div class=\"tab\"><p>Put the jar in mods.</p></div><div class=\"tab\"><p>Not yet.</p></div></div>"
+      "from": "base.css",
+      "use": "Switch between instructions for different loaders or platforms. The radio controls work without JavaScript.",
+      "example": "<div class=\"tabs\"><input type=\"radio\" name=\"ex-tabs\" id=\"ex-a\" checked><label for=\"ex-a\">Fabric</label><input type=\"radio\" name=\"ex-tabs\" id=\"ex-b\"><label for=\"ex-b\">NeoForge</label><div class=\"tab\"><p>Put the jar in mods.</p></div><div class=\"tab\"><p>Put the NeoForge build in mods.</p></div></div>"
     },
     {
       "name": "soon",
       "kind": "class",
-      "from": "base.css",
       "selector": ".soon",
-      "use": "Something on its way: a store in review. data-tip says since when.",
-      "avoid": "Anything without a date.",
-      "example": "<span class=\"soon\" tabindex=\"0\" data-tip=\"In review since 2026-11-20\"><span class=\"soon__spin\"></span>CurseForge</span>"
+      "from": "base.css",
+      "use": "Show a pending store listing with its review date.",
+      "example": "<span class=\"soon\" tabindex=\"0\" data-tip=\"In review since 2026-11-20\"><span class=\"soon__spin\" aria-hidden=\"true\"></span>CurseForge in review</span>"
     },
     {
       "name": "actions",
       "kind": "class",
-      "from": "base.css",
       "selector": ".actions",
-      "use": "A row of links under a heading or lead: downloads, source.",
-      "avoid": "Buttons that act on the page.",
-      "example": "<div class=\"actions\"><a href=\"#\">Modrinth ↗</a><a href=\"#\">CurseForge ↗</a><span>1.20.1 to 26.3</span></div>"
+      "from": "base.css",
+      "use": "Put downloads and source links together below the lead.",
+      "example": "<div class=\"actions\"><a href=\"https://modrinth.com/\">Modrinth ↗</a><a href=\"https://www.curseforge.com/\">CurseForge ↗</a><span>1.20.1 to 26.3</span></div>"
     },
     {
       "name": "meta",
       "kind": "class",
-      "from": "base.css",
       "selector": ".meta, .lead",
-      "use": ".lead for the line under a title; .meta for small mono notes: dates, counts, keys.",
-      "avoid": "Body text.",
+      "from": "base.css",
+      "use": "Show a short lead and supporting metadata such as an update date.",
       "example": "<p class=\"lead\">Old and new transitions, side by side.</p><p class=\"meta\">Updated 2026-11-23</p>"
+    },
+    {
+      "name": "callout",
+      "kind": "class",
+      "selector": ".ui-callout",
+      "from": "ui.css",
+      "use": "Highlight a requirement or a brief note alongside the instructions.",
+      "example": "<aside class=\"ui-callout\" aria-labelledby=\"example-note\"><h3 id=\"example-note\">Client only</h3><p>Install the mod on your client. Servers can run without it.</p></aside>"
+    },
+    {
+      "name": "breadcrumbs",
+      "kind": "class",
+      "selector": ".ui-breadcrumbs",
+      "from": "ui.css",
+      "use": "Show where a page sits in a documentation hierarchy.",
+      "example": "<nav class=\"ui-breadcrumbs\" aria-label=\"Breadcrumb\"><ol><li><a href=\"#components\">Docs</a></li><li><a href=\"#tabs\">Install</a></li><li aria-current=\"page\">Fabric</li></ol></nav>"
+    },
+    {
+      "name": "progress",
+      "kind": "class",
+      "selector": ".ui-progress",
+      "from": "ui.css",
+      "use": "Show a known amount of work completed.",
+      "example": "<div class=\"ui-progress\"><label for=\"example-progress\">Indexing files</label><span aria-hidden=\"true\">7 / 12</span><progress id=\"example-progress\" value=\"7\" max=\"12\">7 of 12</progress></div>"
     }
   ]
 }
