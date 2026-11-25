@@ -113,22 +113,72 @@ def gallery(dest):
         shutil.copy2(UI / f, assets / 'ui' / f)
     tone(assets / 'ui/sample.wav', 3, [55, 55, 65.4, 49], 120)
     tone(assets / 'ui/sample-new.wav', 3, [55, 65.4, 73.4, 82.4], 120)
+    shutil.copy2(SHARED / 'gallery.css', assets / 'gallery.css')
+    shutil.copy2(SHARED / 'gallery.js', assets / 'gallery.js')
     sections = []
+    groups = {'ui.css': ('Interface', []), 'ui.js': ('Interactive', []), 'base.css': ('Wiki', [])}
     for c in m['components']:
-        extra = '<p class="meta">Avoid: ' + html.escape(c['avoid']) + '</p>' if c.get('avoid') else ''
-        sections.append(f'<section class="part" id="{c["name"]}"><h2>{html.escape(c["name"])}</h2>'
-                        f'<p class="meta">{html.escape(c["selector"])} · {c["from"]}</p><p>{html.escape(c["use"])}</p>{extra}'
-                        f'<div class="part__live">{c["example"]}</div>'
-                        f'<ui-copy><pre><code>{html.escape(c["example"])}</code></pre></ui-copy></section>')
-    page = ('<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
-            '<meta name="theme-color" content="#000000"><title>Components</title>' + ''.join(m['head']) +
-            '<style>.part{display:flex;flex-direction:column;gap:var(--s2);padding-block:calc(var(--s4) - 1px) var(--s4);border-top:1px solid var(--border)}'
-            '.part>p{max-width:var(--measure)}.part pre{margin:0;padding:calc(var(--s2) - 1px);border:1px solid var(--border);overflow-x:auto;font:14px/24px PlexMono,monospace}'
-            '.hero{display:flex;flex-direction:column;gap:var(--s2);padding-block:var(--s6)}</style></head><body>'
-            '<header class="site-header shell"><span class="brand">Components</span><nav aria-label="Parts">'
-            + ''.join(f'<a href="#{c["name"]}">{c["name"]}</a>' for c in m['components']) + '</nav></header>'
-            '<main class="shell"><section class="hero"><h1>Components.</h1><p class="lead">' + html.escape(m['about'].split('. ')[0]) + '.</p></section>'
-            + ''.join(sections) + '</main><footer class="site-footer shell"><a href="https://github.com/simply-sunny/ui-library">Source on GitHub</a><span>python3 create.py --list</span></footer></body></html>')
+        name = html.escape(c['name'])
+        title = html.escape(c['name'].replace('-', ' ').capitalize())
+        selector = html.escape(c['selector'])
+        stylesheet = html.escape(c['from'])
+        example = c['example']
+        avoid = f'<p class="part__note"><span>Avoid</span> {html.escape(c["avoid"])}</p>' if c.get('avoid') else ''
+        groups[c['from']][1].append(f'<a href="#{name}">{title}</a>')
+        sections.append(f"""
+          <section class="part" id="{name}" aria-labelledby="{name}-title">
+            <header class="part__header">
+              <h2 id="{name}-title">{title}</h2>
+              <p>{html.escape(c['use'])}</p>
+            </header>
+            <div class="part__frame">
+              <div class="part__bar"><span>Preview</span><code>{selector}</code></div>
+              <div class="part__live"><div class="part__example">{example}</div></div>
+              <details class="part__source">
+                <summary><span>View markup</span><code>{stylesheet}</code></summary>
+                <ui-copy><pre><code>{html.escape(example)}</code></pre></ui-copy>
+              </details>
+            </div>
+            {avoid}
+          </section>
+        """)
+    navigation = ''.join(
+        f'<div class="index__group"><p>{label}</p>{"".join(links)}</div>'
+        for label, links in groups.values()
+    )
+    about = html.escape(m['about'].partition('. ')[0])
+    page = f"""<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#000000">
+  <title>UI Library</title>
+  {''.join(m['head'])}
+  <link rel="stylesheet" href="./assets/gallery.css">
+  <script type="module" src="./assets/gallery.js"></script>
+</head>
+<body id="top">
+  <a class="skip" href="#components">Skip to components</a>
+  <header class="gallery-header">
+    <div class="gallery-header__inner">
+      <a class="gallery-brand" href="#top">UI Library</a>
+      <a href="https://github.com/simply-sunny/ui-library">GitHub ↗</a>
+    </div>
+  </header>
+  <div class="gallery">
+    <nav class="index" aria-label="Component index">{navigation}</nav>
+    <main id="components" tabindex="-1">
+      <header class="gallery-intro">
+        <h1>Components</h1>
+        <p>{about}.</p>
+      </header>
+      {''.join(sections)}
+    </main>
+  </div>
+</body>
+</html>
+"""
     (dest / 'index.html').write_text(page)
     print(f'Created {dest}/index.html. Serve it (audio needs http): python3 -m http.server -d {dest}')
 
