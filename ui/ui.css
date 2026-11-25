@@ -1,0 +1,55 @@
+/* Shared UI components: the wiki look as parts any page can use. Classes and elements are documented in
+   components.json (python3 create.py --list). Edit them here, in ui-library.
+   Everything reads base.css's tokens: colours, the 8px spacing scale and the type pairs. */
+
+/* A bordered button, 24px tall. aria-pressed="true" marks one that's on. */
+.ui-button{font:14px/24px Plex,Arial,sans-serif;color:var(--foreground);background:none;border:1px solid var(--border);border-radius:0;padding:0 calc(var(--s1) - 1px);height:24px;cursor:pointer;white-space:nowrap}
+.ui-button:hover{border-color:var(--focus);color:#e0e0e0}
+.ui-button[aria-pressed=true]{background:#181818;border-color:var(--focus)}
+.ui-button:disabled{color:var(--muted);border-color:var(--border);cursor:default}
+
+/* A row of text toggles: muted, the pressed one underlined. For picking one of a few views or versions. */
+.ui-toggle{display:flex;flex-wrap:wrap;align-items:center;gap:var(--s1) var(--s3);font-size:14px;line-height:24px}
+.ui-toggle button{font:inherit;background:none;border:0;padding:0;color:var(--muted);cursor:pointer}
+.ui-toggle button:hover{color:var(--foreground)}
+.ui-toggle button[aria-pressed=true]{color:var(--foreground);text-decoration:underline;text-underline-offset:4px}
+
+/* A short value in a box: a key, a tempo, a version. --ui-tone colours its border and text. */
+.ui-badge{display:inline-block;font:12px/16px PlexMono,monospace;color:var(--ui-tone,var(--foreground));border:1px solid var(--ui-tone,var(--border));padding:0 calc(var(--s1) - 1px);vertical-align:1px;white-space:nowrap}
+
+/* A key on the keyboard, in running text or a table. */
+.ui-keycap{display:inline-block;font:12px/16px PlexMono,monospace;color:var(--foreground);background:#151515;border:1px solid #3a3a3a;border-bottom-color:#5a5a5a;padding:0 calc(var(--s1) - 1px);vertical-align:1px;white-space:nowrap}
+
+/* Numbers side by side, each a small label over its value. */
+.ui-stats{display:flex;flex-wrap:wrap;gap:var(--s2) var(--s4);margin:0}
+.ui-stats div{display:flex;flex-direction:column-reverse}
+.ui-stats dt{font:12px/16px PlexMono,monospace;color:var(--muted)}
+.ui-stats dd{margin:0;font-size:24px;line-height:32px;letter-spacing:-.02em}
+
+/* A labelled text box or select, underlined as the wiki's search. */
+.ui-field{display:flex;flex-direction:column;gap:var(--s1);max-width:var(--measure)}
+.ui-field label{font:12px/16px PlexMono,monospace;color:var(--muted)}
+.ui-field :is(input,select,textarea){font:14px/24px Plex,Arial,sans-serif;color:var(--foreground);background:none;border:0;border-bottom:1px solid var(--border);border-radius:0;padding:var(--s1) 0 calc(var(--s1) - 1px)}
+.ui-field :is(input,select,textarea):focus-visible{outline:none;border-bottom-color:var(--focus)}
+.ui-field select option{background:var(--background)}
+
+/* A table comparing columns: the first column names the row, in muted text. */
+.ui-compare-table td:first-child{color:var(--muted)}
+
+/* A section that opens: the summary is the heading, the rest shows when open. */
+.ui-details{border-top:1px solid var(--border);padding-top:calc(var(--s2) - 1px)}
+.ui-details summary{cursor:pointer;font-weight:500;list-style:none}
+.ui-details summary::-webkit-details-marker{display:none}
+.ui-details summary::before{content:'+';display:inline-block;width:var(--s3);color:var(--muted);font-family:PlexMono,monospace}
+.ui-details[open] summary::before{content:'−'}
+.ui-details>:not(summary){margin-top:var(--s2);padding-left:var(--s3);max-width:var(--measure)}
+
+/* Elements from ui.js. Each is a block on the page's left edge; its parts use the classes above. */
+ui-wave,ui-compare,ui-plot,ui-copy{display:block;min-width:0}
+ui-compare{display:flex;flex-direction:column;gap:var(--s2)}
+.ui-bar{display:flex;flex-wrap:wrap;align-items:center;gap:var(--s1) var(--s3);font-size:14px;line-height:24px}
+.ui-bar .meta{margin-left:auto}
+.ui-canvas{display:block;width:100%;touch-action:none}
+ui-wave .ui-canvas{cursor:pointer}
+ui-copy{display:flex;flex-direction:column;gap:var(--s1)}
+ui-copy .ui-button{order:-1;align-self:flex-end}

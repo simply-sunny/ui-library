@@ -1,0 +1,242 @@
+{
+  "about": "Shared components for mod wikis and websites. The ui directory holds ui.css and ui.js. The base stylesheet holds the tokens and base components. Add them to a site with `python3 create.py --dest <site>/public/assets/ui`.",
+  "head": [
+    "<link rel=\"stylesheet\" href=\"./assets/base.css\">",
+    "<link rel=\"stylesheet\" href=\"./assets/ui/ui.css\">",
+    "<script type=\"module\" src=\"./assets/ui/ui.js\"></script>"
+  ],
+  "rules": [
+    "Use a part from this list before writing new CSS. A new part goes here, in the templates, not in one site.",
+    "Spacing uses the tokens --s1 to --s8, or a token less 1px under a border (docs/LAYOUT.md). Line heights are multiples of 8.",
+    "Colours come from base.css: --foreground, --muted, --border, --focus. Elements read them at draw time.",
+    "No rounded corners, shadows, gradients or icons. Pressed or current things are underlined (text) or outlined (buttons).",
+    "Text in parts follows docs/WRITING.md: short, exact, no hype."
+  ],
+  "components": [
+    {
+      "name": "button",
+      "kind": "class",
+      "from": "ui.css",
+      "selector": ".ui-button",
+      "use": "An action that isn't a link: Play, Copy, Reset. aria-pressed=\"true\" for one that's on.",
+      "avoid": "Navigation (use a link) and picking one of a few views (use toggle).",
+      "example": "<button class=\"ui-button\" type=\"button\">Play</button> <button class=\"ui-button\" type=\"button\" aria-pressed=\"true\">Loop</button>"
+    },
+    {
+      "name": "toggle",
+      "kind": "class",
+      "from": "ui.css",
+      "selector": ".ui-toggle",
+      "use": "Picking one of a few views, filters or versions. Set aria-pressed on each button and update it in your script.",
+      "avoid": "More than about six choices (use a select in a field).",
+      "example": "<div class=\"ui-toggle\" role=\"group\" aria-label=\"Version\"><button type=\"button\" aria-pressed=\"false\">Old</button><button type=\"button\" aria-pressed=\"true\">New</button></div>"
+    },
+    {
+      "name": "badge",
+      "kind": "class",
+      "from": "ui.css",
+      "selector": ".ui-badge",
+      "use": "A short value beside a name: a key, a tempo, a version. style=\"--ui-tone:#hex\" colours it.",
+      "avoid": "Sentences, and colour as the only way to tell values apart.",
+      "example": "<span class=\"ui-badge\">128 bpm</span> <span class=\"ui-badge\" style=\"--ui-tone:#e0b070\">5A</span>"
+    },
+    {
+      "name": "keycap",
+      "kind": "class",
+      "from": "ui.css",
+      "selector": ".ui-keycap",
+      "use": "A key in running text or a Keys table.",
+      "avoid": "Keys the browser keeps, like Ctrl+Tab.",
+      "example": "Press <kbd class=\"ui-keycap\">Space</kbd> to play."
+    },
+    {
+      "name": "stats",
+      "kind": "class",
+      "from": "ui.css",
+      "selector": ".ui-stats",
+      "use": "A few numbers that matter, each with a short label: results, sizes, counts.",
+      "avoid": "More than five, or numbers that need a sentence to make sense.",
+      "example": "<dl class=\"ui-stats\"><div><dt>Tempo</dt><dd>128.00</dd></div><div><dt>Beats apart</dt><dd>25 ms</dd></div><div><dt>Bars</dt><dd>8</dd></div></dl>"
+    },
+    {
+      "name": "field",
+      "kind": "class",
+      "from": "ui.css",
+      "selector": ".ui-field",
+      "use": "A labelled text box, select or text area.",
+      "avoid": "Placeholder text in place of a label.",
+      "example": "<div class=\"ui-field\"><label for=\"ex-name\">Name</label><input id=\"ex-name\" value=\"Cue My Music\"></div>"
+    },
+    {
+      "name": "compare-table",
+      "kind": "class",
+      "from": "ui.css",
+      "selector": "table.ui-compare-table",
+      "use": "Two or three versions side by side, row by row. Put it in .table-wrap.",
+      "avoid": "One column of data (use a plain table).",
+      "example": "<div class=\"table-wrap\"><table class=\"ui-compare-table\"><thead><tr><th></th><th>Old</th><th>New</th></tr></thead><tbody><tr><td>Tempo</td><td>125.03</td><td>128.00</td></tr><tr><td>Length</td><td>4 bars</td><td>8 bars</td></tr></tbody></table></div>"
+    },
+    {
+      "name": "details",
+      "kind": "class",
+      "from": "ui.css",
+      "selector": "details.ui-details",
+      "use": "Something most readers skip: a long list, the steps for a rare case.",
+      "avoid": "Hiding what everyone needs.",
+      "example": "<details class=\"ui-details\"><summary>Build from source</summary><p>Run <code>./gradlew build</code>.</p></details>"
+    },
+    {
+      "name": "wave",
+      "kind": "element",
+      "from": "ui.js",
+      "selector": "ui-wave",
+      "use": "One sound, with its waveform: click to seek, Play or Space to play.",
+      "avoid": "Several versions of one sound (use compare).",
+      "attributes": [
+        {
+          "name": "src",
+          "type": "url",
+          "desc": "The sound file, same origin."
+        },
+        {
+          "name": "regions",
+          "type": "start,end[;start,end]",
+          "default": "",
+          "desc": "Seconds to shade."
+        },
+        {
+          "name": "height",
+          "type": "px",
+          "default": "96",
+          "desc": "Waveform height, a multiple of 8."
+        }
+      ],
+      "example": "<ui-wave src=\"./assets/ui/sample.wav\" regions=\"1,2.5\"></ui-wave>"
+    },
+    {
+      "name": "compare",
+      "kind": "element",
+      "from": "ui.js",
+      "selector": "ui-compare",
+      "use": "Versions of one sound, heard from the same moment: before and after a change. Space plays, 1 to 9 pick.",
+      "avoid": "Unrelated sounds (use a wave each).",
+      "attributes": [
+        {
+          "name": "height",
+          "type": "px",
+          "default": "96",
+          "desc": "Waveform height."
+        },
+        {
+          "name": "audio[data-label]",
+          "type": "text",
+          "desc": "Each version's name, in a child audio element."
+        },
+        {
+          "name": "audio[data-regions]",
+          "type": "start,end[;start,end]",
+          "desc": "Seconds to shade in that version."
+        }
+      ],
+      "events": [
+        {
+          "name": "ui-pick",
+          "detail": "{index, label}",
+          "desc": "A version was picked."
+        }
+      ],
+      "example": "<ui-compare><audio src=\"./assets/ui/sample.wav\" data-label=\"Old\" data-regions=\"0.5,1.5\"></audio><audio src=\"./assets/ui/sample-new.wav\" data-label=\"New\" data-regions=\"1,2.5\"></audio></ui-compare>"
+    },
+    {
+      "name": "plot",
+      "kind": "element",
+      "from": "ui.js",
+      "selector": "ui-plot",
+      "use": "A handful of numbers to compare at a glance: per bar, per run, per version. band marks the range that's fine.",
+      "avoid": "Exact values someone will read off (use a table), and more than about 60 points.",
+      "attributes": [
+        {
+          "name": "values",
+          "type": "number,number,…",
+          "desc": "The values, in order."
+        },
+        {
+          "name": "labels",
+          "type": "text,text,…",
+          "default": "",
+          "desc": "A label under each value."
+        },
+        {
+          "name": "kind",
+          "type": "bars|line",
+          "default": "bars",
+          "desc": "How to draw them."
+        },
+        {
+          "name": "band",
+          "type": "low,high",
+          "default": "",
+          "desc": "The range that's fine; values past it draw muted."
+        },
+        {
+          "name": "unit",
+          "type": "text",
+          "default": "",
+          "desc": "After each axis number, like ms."
+        },
+        {
+          "name": "height",
+          "type": "px",
+          "default": "120",
+          "desc": "Chart height, a multiple of 8."
+        }
+      ],
+      "example": "<ui-plot values=\"22,8,-17,-11,4,0,-25,20\" labels=\"1,2,3,4,5,6,7,8\" band=\"-30,30\" unit=\" ms\"></ui-plot>"
+    },
+    {
+      "name": "copy",
+      "kind": "element",
+      "from": "ui.js",
+      "selector": "ui-copy",
+      "use": "A command or snippet people paste: a Copy button on its code block.",
+      "avoid": "Code people read rather than run.",
+      "example": "<ui-copy><pre><code>python3 create.py --dest public/assets/ui</code></pre></ui-copy>"
+    },
+    {
+      "name": "tabs",
+      "kind": "class",
+      "from": "base.css",
+      "selector": ".tabs",
+      "use": "The same steps for different setups, one shown at a time (Fabric first). Works without JavaScript; up to four tabs.",
+      "avoid": "Content everyone should read.",
+      "example": "<div class=\"tabs\"><input type=\"radio\" name=\"ex-tabs\" id=\"ex-a\" checked><label for=\"ex-a\">Fabric</label><input type=\"radio\" name=\"ex-tabs\" id=\"ex-b\"><label for=\"ex-b\">NeoForge</label><div class=\"tab\"><p>Put the jar in mods.</p></div><div class=\"tab\"><p>Not yet.</p></div></div>"
+    },
+    {
+      "name": "soon",
+      "kind": "class",
+      "from": "base.css",
+      "selector": ".soon",
+      "use": "Something on its way: a store in review. data-tip says since when.",
+      "avoid": "Anything without a date.",
+      "example": "<span class=\"soon\" tabindex=\"0\" data-tip=\"In review since 2026-11-20\"><span class=\"soon__spin\"></span>CurseForge</span>"
+    },
+    {
+      "name": "actions",
+      "kind": "class",
+      "from": "base.css",
+      "selector": ".actions",
+      "use": "A row of links under a heading or lead: downloads, source.",
+      "avoid": "Buttons that act on the page.",
+      "example": "<div class=\"actions\"><a href=\"#\">Modrinth ↗</a><a href=\"#\">CurseForge ↗</a><span>1.20.1 to 26.3</span></div>"
+    },
+    {
+      "name": "meta",
+      "kind": "class",
+      "from": "base.css",
+      "selector": ".meta, .lead",
+      "use": ".lead for the line under a title; .meta for small mono notes: dates, counts, keys.",
+      "avoid": "Body text.",
+      "example": "<p class=\"lead\">Old and new transitions, side by side.</p><p class=\"meta\">Updated 2026-11-23</p>"
+    }
+  ]
+}
